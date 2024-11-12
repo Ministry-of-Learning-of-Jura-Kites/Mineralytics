@@ -1,6 +1,6 @@
 from datetime import datetime
 from itertools import repeat
-from multiprocessing import Manager
+from multiprocess import Manager
 from pathos.multiprocessing import ProcessingPool as Pool
 import pandas as pd
 import os
