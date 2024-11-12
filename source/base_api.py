@@ -11,7 +11,7 @@ UPDATE_PERCENT_EVERY = 40  # every n updates -> update loading bar
 
 def relative_to_abs(relative_path):
     dirname = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(dirname, *map(str, relative_path))
+    return os.path.join(dirname,'..', *map(str, relative_path))
 
 
 def load_json(path, filter):
