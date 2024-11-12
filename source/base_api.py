@@ -1,7 +1,8 @@
 from datetime import datetime
 from itertools import repeat
-from multiprocess import Manager
+# from multiprocessing import Manager
 from pathos.multiprocessing import ProcessingPool as Pool
+from pathos.helpers import mp as multiprocess
 import pandas as pd
 import os
 import json
@@ -23,7 +24,7 @@ def load_json(path, filter):
 
 
 def load_data_of_year(year, filter, max=-1):
-    manager = Manager()
+    manager = multiprocess.Manager()
     counter = manager.Value(0, 0)
     lock = manager.Lock()
     start_time = datetime.now()
@@ -69,7 +70,7 @@ def load_data_of_year(year, filter, max=-1):
 
 
 def load_all_data(filter):
-    manager = Manager()
+    manager = multiprocess.Manager()
     counter = manager.Value(0, 0)
     lock = manager.Lock()
     start_time = datetime.now()
