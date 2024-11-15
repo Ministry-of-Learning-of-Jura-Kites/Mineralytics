@@ -11,6 +11,8 @@ def filter(df):
 
 if __name__ == "__main__":
     df = base_api.load_all_data(filter)
+
+    # for testing
     # df = base_api.load_data_of_year(
     #     2018,
     #     lambda df: df.drop(
@@ -18,7 +20,7 @@ if __name__ == "__main__":
     #             ["abstracts-retrieval-response.language.@xml:lang"]
     #         )
     #     ),
-    #     max=100,
+    #     100,
     # )
 
     value_counts = df[lang_column].value_counts()
