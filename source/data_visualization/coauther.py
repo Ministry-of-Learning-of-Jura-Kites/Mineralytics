@@ -8,6 +8,6 @@ df = base_api.load_data_of_year(
             ["bibrecord.head.author-group"]
         )
     ),
-    max=1,
+    1,
 )
 print(df)

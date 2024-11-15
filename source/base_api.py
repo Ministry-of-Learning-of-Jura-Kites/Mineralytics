@@ -1,7 +1,11 @@
 from datetime import datetime
 from itertools import repeat
+import signal
+from threading import Thread
+import time
 from pathos.multiprocessing import ProcessingPool as Pool
 from pathos.helpers import mp as multiprocess
+from pathos.pools import ThreadPool
 import pandas as pd
 import os
 import json
@@ -42,14 +46,20 @@ def download_function(counter,counter_lock,start_time,max,has_exit,has_exit_lock
             if counter.value == max:
                 print()
             return data
+        except KeyboardInterrupt:
+            with has_exit_lock:
+              if not has_exit.value:
+                print("\nexiting...")
+                has_exit.value=True
         except Exception as e:
             print("error:",traceback.format_exc(),"\nfrom index:", index,", file:",file)
             with has_exit_lock:
-              has_exit.value=True
+              if not has_exit.value:
+                print("\nexiting...")
+                has_exit.value=True
       return download
 
 def load_data_of_year(year: int, filter:  Callable[[pd.DataFrame],pd.DataFrame], max_files_count: int=-1):
-    
     def read_data():
       folder_path = relative_to_abs(["data", year])
       files_list = os.listdir(folder_path)
@@ -79,13 +89,15 @@ def load_data(read_data: Callable[[],None],filter: Callable[[pd.DataFrame],pd.Da
     pool = Pool()
 
     print()
-    
-    data = pool.map(download_function(counter,counter_lock,start_time,max_files_count,has_exit,has_exit_lock,filter), range(0, max_files_count), files_list)
+
+    try:
+      data = pool.map(download_function(counter,counter_lock,start_time,max_files_count,has_exit,has_exit_lock,filter), range(0, max_files_count), files_list)
+    except KeyboardInterrupt:
+      pass
     if has_exit.value:
       exit(1)
     df = pd.concat(data)
     return df
-
 
 def load_all_data(filter: Callable[[pd.DataFrame],pd.DataFrame]):
   def read_data():

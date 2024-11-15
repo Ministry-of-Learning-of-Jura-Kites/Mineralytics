@@ -9,4 +9,7 @@ if __name__ == '__main__':
     print("error: don't call this file to run itself!")
     exit(1)
 
-  subprocess.run(['python','-m',target_path.replace(os.path.sep,'.').removesuffix(".py").removeprefix(".")],shell=True)
+  try:
+    subprocess.run(['python','-m',target_path.replace(os.path.sep,'.').removesuffix(".py").removeprefix(".")],shell=True)
+  except KeyboardInterrupt:
+    pass
