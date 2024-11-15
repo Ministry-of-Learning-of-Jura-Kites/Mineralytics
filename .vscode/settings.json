@@ -1,5 +1,5 @@
 {
   "code-runner.executorMap": {
-    "python": "cd $workspaceRoot && python -u run.py $fullFileName"
+    "python": "cd \"$workspaceRoot\" && python -u run.py $fullFileName"
   }
 }
