@@ -1,16 +1,19 @@
+import json
+import pandas as pd
 import source.base_api as base_api
 import matplotlib.pyplot as plt
-import numpy as np
 
 lang_column = "abstracts-retrieval-response.language.@xml:lang"
 
 
-def filter(df):
+def transform(file):
+    data = json.load(file)
+    df = pd.json_normalize(data)
     return df.drop(columns=df.columns.difference([lang_column]))
 
 
 if __name__ == "__main__":
-    df = base_api.load_all_data(filter)
+    df = base_api.load_all_data(transform)
 
     # for testing
     # df = base_api.load_data_of_year(

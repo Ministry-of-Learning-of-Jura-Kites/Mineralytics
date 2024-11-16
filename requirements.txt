@@ -1,3 +1,5 @@
 matplotlib
 pandas
 pathos
+networkx
+scipy

@@ -1,6 +1,6 @@
 # Setup
 
-- 1.run 
+- 1.run
 
 ```
 pip install -r requirements.txt
@@ -11,6 +11,7 @@ pip install -r requirements.txt
 file structure should look like
 
 dir  
+├─ .vscode  
 ├─ data  
 &ensp;&ensp;├─ 2018  
 &ensp;&ensp;├─ 2019  
@@ -18,10 +19,10 @@ dir
 &ensp;&ensp;├─ 2021  
 &ensp;&ensp;├─ 2022  
 &ensp;&ensp;├─ 2023  
-├─ data_visualization  
+├─ source  
 ├─ .gitignore  
 ├─ readme.md  
-├─ base_api.py
+├─ run.py
 
 # Development
 
