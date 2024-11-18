@@ -10,6 +10,6 @@ if __name__ == '__main__':
     exit(1)
 
   try:
-    subprocess.run(['python','-m',target_path.replace(os.path.sep,'.').removesuffix(".py").removeprefix(".")],shell=True)
+    subprocess.run([sys.executable,'-m',target_path.replace(os.path.sep,'.').removesuffix(".py").removeprefix(".")])
   except KeyboardInterrupt:
     pass
