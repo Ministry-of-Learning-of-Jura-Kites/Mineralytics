@@ -3,3 +3,4 @@ pandas
 pathos
 networkx
 scipy
+bs4
