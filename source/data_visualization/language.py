@@ -34,4 +34,6 @@ if __name__ == "__main__":
     plt.yscale("log", base=2)
     plt.ylabel("count")
     plt.xlabel("language")
-    plt.show()
+    plt.show(block=False)
+    input()
+    plt.close("all")
