@@ -42,7 +42,18 @@ def scrape_paper(url):
         get_first_child,
         soup.select("ol.c-article-author-affiliation__list li p:nth-child(2)"),
     )
-    print(list(zip(organizations, organizations_authors)))
+    #print(list(zip(organizations, organizations_authors)))
+    
+    journal_title = map(
+        get_first_child,
+        soup.select("i[data-test='journal-title']"),
+    )
+    #print(list(journal_title))
+    
+    subject = map(
+         get_first_child,
+         soup.select("li.c-article-subject-list__subject"))
+    #print(list(subject))
 
 
 scrape_paper("https://www.nature.com/articles/nphys2615")
