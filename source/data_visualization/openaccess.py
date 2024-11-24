@@ -4,18 +4,14 @@ import source.base_api as base_api
 import plotly.express as px
 
 def transform(file):
-    
-    data = json.load(file)
 
+    data = json.load(file)
     
     publisher_data = data["abstracts-retrieval-response"]["item"]["bibrecord"]["head"]["source"].get("publisher", {})
     publishername = publisher_data.get("publishername", None)
-
-    
     coredata = data["abstracts-retrieval-response"].get("coredata", {})
     coredata_openaccess = coredata.get("openaccess", None)
 
-    
     df = pd.DataFrame(
         [{
             "publishername": publishername,
@@ -24,7 +20,6 @@ def transform(file):
     )
 
     return df
-
 
 if __name__ == "__main__":
     
