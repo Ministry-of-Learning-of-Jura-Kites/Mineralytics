@@ -1,26 +1,14 @@
 import json
 import pandas as pd
 import base_api as base_api
+from data_visualization.get_data import get_data
 import matplotlib.pyplot as plt
 import streamlit as st
 
-lang_column = "abstracts-retrieval-response.language.@xml:lang"
+lang_column = "lang"
 
-
-def transform(file):
-    data = json.load(file)
-    df = pd.json_normalize(data)
-    return df.drop(columns=df.columns.difference([lang_column]))
-
-
-# if __name__ == "__main__":
-@st.cache_data
-def get_data():
-    return base_api.load_all_data(transform)
-
-
-def language():
-    df = get_data()
+def get_fig():
+    series = get_data()[lang_column]
     # for testing
     # df = base_api.load_data_of_year(
     #     2018,
@@ -32,7 +20,7 @@ def language():
     #     100,
     # )
 
-    value_counts = df[lang_column].value_counts()
+    value_counts = series.value_counts()
     fig, ax = plt.subplots()
     ax.bar(
         value_counts.index.to_list(),
