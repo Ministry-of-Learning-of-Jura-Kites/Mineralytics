@@ -4,3 +4,5 @@ pathos
 networkx
 scipy
 bs4
+plotly
+streamlit

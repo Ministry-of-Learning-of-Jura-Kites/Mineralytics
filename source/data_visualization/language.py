@@ -1,7 +1,8 @@
 import json
 import pandas as pd
-import source.base_api as base_api
+import base_api as base_api
 import matplotlib.pyplot as plt
+import streamlit as st
 
 lang_column = "abstracts-retrieval-response.language.@xml:lang"
 
@@ -12,9 +13,14 @@ def transform(file):
     return df.drop(columns=df.columns.difference([lang_column]))
 
 
-if __name__ == "__main__":
-    df = base_api.load_all_data(transform)
+# if __name__ == "__main__":
+@st.cache_data
+def get_data():
+    return base_api.load_all_data(transform)
 
+
+def language():
+    df = get_data()
     # for testing
     # df = base_api.load_data_of_year(
     #     2018,
@@ -27,13 +33,12 @@ if __name__ == "__main__":
     # )
 
     value_counts = df[lang_column].value_counts()
-    plt.bar(
+    fig, ax = plt.subplots()
+    ax.bar(
         value_counts.index.to_list(),
         value_counts.values,
     )
-    plt.yscale("log", base=2)
-    plt.ylabel("count")
-    plt.xlabel("language")
-    plt.show(block=False)
-    input()
-    plt.close("all")
+    ax.set_yscale("log", base=2)
+    ax.set_ylabel("count")
+    ax.set_xlabel("language")
+    return fig
