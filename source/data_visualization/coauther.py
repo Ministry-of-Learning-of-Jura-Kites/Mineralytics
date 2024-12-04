@@ -27,12 +27,12 @@ def transform(file):
                 organization,
                 list,
             ):
-                organization = list(map(lambda x: x["$"], organization))
+                organization = ", ".join(map(lambda x: x["$"], organization))
             else:
-                organization = [organization["$"]]
+                organization = organization["$"]
             organizations.append(organization)
     # else:
-    df = pd.DataFrame({"organization": organizations})
+    df = pd.DataFrame({"organization": [organizations]})
 
     return df
 
@@ -53,31 +53,33 @@ if __name__ == "__main__":
     # ) as file:
     #     df = transform(file)
 
-    print(df)
-
-    # df = df.drop_duplicates()
+    df = df.drop_duplicates()
     # df = df[
-    #     df["indexed-name"].isin(df["indexed-name"].value_counts().nlargest(20).index)
+    #     df["organization"].isin(df["organization"].value_counts().nlargest(20).index)
     # ]
+    # df = df.rename_axis('index1').reset_index()
+    df['index1'] = df.reset_index().index
+    df = df.explode("organization")
+    df = pd.get_dummies(
+        df, prefix="", prefix_sep="", columns=["organization"], drop_first=True
+    )
+    pd.set_option('display.max_columns', None)
+    df = df.groupby("index1").agg(lambda series: series.any())
+    print(df)
+    adj = df.T @ df
+    np.fill_diagonal(adj.values, 0)
 
-    # df = pd.get_dummies(
-    #     df, prefix="", prefix_sep="", columns=["indexed-name"], drop_first=True
-    # ).set_index("eid")
-    # df = df.groupby("eid").agg(lambda series: series.any())
-    # adj = df.T @ df
-    # np.fill_diagonal(adj.values, 0)
+    adj_sparse = csr_matrix(adj.values)
 
-    # adj_sparse = csr_matrix(adj.values)
-
-    # G = nx.from_scipy_sparse_array(triu(adj_sparse))
-    # G = nx.from_pandas_adjacency(adj)
-    # d = dict(G.degree)
-    # the_base_size = 100
-    # nx.draw(
-    #     G,
-    #     with_labels=True,
-    #     node_size=[len(v) ** 1.5 * the_base_size for v in G.nodes()],
-    #     font_size=5,
-    # )
+    G = nx.from_scipy_sparse_array(triu(adj_sparse))
+    G = nx.from_pandas_adjacency(adj)
+    d = dict(G.degree)
+    the_base_size = 2
+    nx.draw(
+        G,
+        with_labels=True,
+        node_size=[len(v) ** 1.5 * the_base_size for v in G.nodes()],
+        font_size=5,
+    )
 
     plt.show()
