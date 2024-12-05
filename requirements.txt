@@ -6,3 +6,4 @@ scipy
 bs4
 plotly
 streamlit
+scikit-learn
