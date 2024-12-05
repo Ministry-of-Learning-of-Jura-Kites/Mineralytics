@@ -15,8 +15,6 @@ from source.machine_learning.subject_area import get_data ,model_training
 #     print(df.columns)
 #     return df.drop(columns=df.columns.difference([lang_column]))
 def model_training(data) :  
-    data = get_data()
-    
     #: only include $ , @abbrev
     X_model1 = data.drop(columns=['year', 'count'])
     y = data['count']
