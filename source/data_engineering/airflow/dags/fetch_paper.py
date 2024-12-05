@@ -10,7 +10,8 @@ from source.data_engineering.airflow.dags.utils import scrape_all
 @dag(
     dag_id="test",
     start_date=datetime.datetime(2024, 12, 5),
-    schedule=datetime.timedelta(seconds=30),
+    schedule_interval=datetime.timedelta(seconds=30),
+    catchup=False
 )
 def generate_dag():
     # EmptyOperator(task_id="test")

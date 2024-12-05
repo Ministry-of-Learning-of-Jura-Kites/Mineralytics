@@ -55,7 +55,7 @@ def is_stored(file_name):
 
 def scrape_all(send_kafka: bool):
     if send_kafka:
-      producer = KafkaProducer(bootstrap_servers="broker")
+      producer = KafkaProducer(bootstrap_servers="broker:9092")
 
     page = 1
     has_next = True
