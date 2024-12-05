@@ -1,5 +1,8 @@
 {
   "code-runner.executorMap": {
     "python": "cd \"$workspaceRoot\" && python -u run.py $fullFileName"
+  },
+  "code-runner.executorMapByGlob": {
+    "*website.py": "cd \"$workspaceRoot/source\" && streamlit run website.py"
   }
 }
