@@ -16,8 +16,8 @@ from source.machine_learning.subject_area import get_data ,model_training
 #     return df.drop(columns=df.columns.difference([lang_column]))
 def model_training(data) :  
     #: only include $ , @abbrev
-    X_model1 = data.drop(columns=['year', 'count'])
-    y = data['count']
+    X_model1 = data.pop("year")
+    y = data.drop(columns=["$" , "@abbrev"])
     
     #: train test split
     X_train1, X_test1, y_train1, y_test1 = train_test_split(X_model1, y, test_size=0.2, random_state=42)
