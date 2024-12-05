@@ -1,12 +1,11 @@
 import json
 import pickle
 import pandas as pd
-from sklearn.base import r2_score
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_squared_error ,r2_score
 from sklearn.model_selection import train_test_split 
 import source.base_api as base_api
-from source.machine_learning.subject_area import get_data ,model_training
+from source.machine_learning.subject_area import get_data
 
 # lang_column = "abstracts-retrieval-response.language.@xml:lang"
 # def transform(file) :
