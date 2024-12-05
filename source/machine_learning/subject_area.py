@@ -32,8 +32,8 @@ def transform(file):
 
 def get_data():
     data = base_api.load_all_data(transform)
-    filter_data = data[['$', '@abbrev', 'year']].groupby(['$', '@abbrev', 'year']).size().reset_index(name='count').sort_values(by='year' , ascending=True)
-
+    filter_data = data[['$', '@abbrev', 'year']].groupby(['$', 'year' , '@abbrev']).size().reset_index(name='count_specific').sort_values(by='year' , ascending=True)
+    # print(filter_data)
     filter_data.dropna(subset='year' , inplace=True)
     return pd.get_dummies(filter_data ,columns=['@abbrev' , '$'])
 
