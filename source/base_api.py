@@ -128,6 +128,8 @@ def load_all_data(transform: Callable[[str], pd.DataFrame]) -> pd.DataFrame:
         files_list = []
         folders_list = os.listdir(relative_to_abs(["data"]))
         for folder in folders_list:
+            if not os.path.isdir(relative_to_abs(["data", folder])):
+              continue
             current_file_list = os.listdir(relative_to_abs(["data", folder]))
             files_list += map(
                 lambda file: os.path.join(folder, file), current_file_list
