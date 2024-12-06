@@ -7,3 +7,6 @@ bs4
 plotly
 streamlit
 kafka-python-ng
+redis
+patool
+pyunpack
