@@ -1,7 +1,7 @@
-FROM apache/airflow:slim-2.10.3-python3.9
+FROM apache/airflow:2.10.3
 
-RUN pip install kafka-python
+COPY ./requirements.txt /opt/airflow/requirements.txt
 
-RUN airflow db init
+RUN pip install -r /opt/airflow/requirements.txt
 
-CMD ["airflow","webserver"]
+ENTRYPOINT ["/bin/bash", "-c","airflow db init && airflow users create --role Admin --username admin --email admin --firstname admin --lastname admin --password admin  && exec $0"]

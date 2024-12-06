@@ -4,23 +4,17 @@ from airflow import DAG
 from airflow.decorators import dag
 from airflow.operators.python import PythonOperator
 
-from source.data_engineering.airflow.dags.utils import scrape_all
+from utils import scrape_all
 
-
-@dag(
-    dag_id="test",
+with DAG(
+    dag_id="find_new_papers",
     start_date=datetime.datetime(2024, 12, 5),
-    schedule_interval=datetime.timedelta(seconds=30),
-    catchup=False
-)
-def generate_dag():
+    schedule=datetime.timedelta(seconds=30),
+    catchup=False,
+) as dag:
     # EmptyOperator(task_id="test")
     PythonOperator(
-        task_id="test",
-        provide_context=False,
+        task_id="find_new_papers",
         python_callable=scrape_all,
         op_args=[True],
     )
-
-
-generate_dag()
