@@ -5,6 +5,18 @@ services:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
+  redis:
+    image: redis:7
+    command:
+      - /bin/sh
+      - -c
+      - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
+    environment:
+      REDIS_PASSWORD: admin
+    volumes:
+      - redis:/var/lib/redis/data
+    ports:
+      - 6379:6379
   # broker:
   #   image: apache/kafka:latest
   #   container_name: broker
@@ -52,3 +64,6 @@ services:
     command: ["airflow scheduler"]
     depends_on:
       - postgres
+
+volumes:
+  redis:
