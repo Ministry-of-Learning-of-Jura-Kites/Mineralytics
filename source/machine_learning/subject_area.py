@@ -32,7 +32,7 @@ def transform(file):
     # Add the year column to the DataFrame
     df_subjects["year"] = year_data
 
-    data = data.rename(
+    df_subjects = df_subjects.rename(
         {"$": "subtopic", "@abbrev": "subject", "@code": "subtopic_code"},
         axis="columns",
     )
@@ -43,12 +43,6 @@ def transform(file):
 def get_data():
     data = base_api.load_all_data(transform)
 
-    # data = base_api.load_data_of_year(
-    #     2018,
-    #     transform,
-    #     100,
-    # )
-
     filter_data = (
         data[data.columns]
         .groupby(data.columns.tolist())
@@ -56,7 +50,9 @@ def get_data():
         .reset_index(name="count_subtopic")
         .sort_values(by="year", ascending=True)
     )
+    
     filter_data.dropna(subset="year", inplace=True)
+    filter_data = filter_data.sort_values(by="year", ascending=True)
     return filter_data
 
 

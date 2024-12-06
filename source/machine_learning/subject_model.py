@@ -7,44 +7,37 @@ from sklearn.model_selection import train_test_split
 import source.base_api as base_api
 from source.machine_learning.subject_area import get_data
 
-NUMBER_OF_TOP = 20
-MINIMUM_YEARS = 3
-
 
 def model_training(data: pd.DataFrame):
     # data=pd.get_dummies(data, columns=["subtopic"],drop_first=True)
-    data = data[["subtopic_code", "count_subtopic", "year"]]
+    data = data[["subject","year", "count_subtopic"]]
     # print(data.set_index(["year", "subtopic"]))
-
+    
+    data = data.groupby(['subject', 'year'], as_index=False).agg({'count_subtopic': 'sum'})
+    
+    data = data.rename(columns={'count_subtopic': 'count_subject'})
+    
     all_combinations = pd.MultiIndex.from_product(
-        [data["subtopic_code"].unique(), data["year"].unique()],
-        names=["subtopic_code", "year"],
+        [data["subject"].unique(), data["year"].unique()],
+        names=["subject", "year"],
     )
 
     data = (
-        data.set_index(["subtopic_code", "year"])
+        data.set_index(["subject", "year"])
         .reindex(all_combinations, fill_value=0)
         .reset_index()
     )
 
     total_count = (
-        data.groupby("subtopic_code")
+        data.groupby("subject")
         .sum(numeric_only=True)
-        .sort_values(by=["count_subtopic"], ascending=False)
         .reset_index()
     )
 
-    count = 0
-
-    for subtopic_code in total_count["subtopic_code"]:
-        if count > NUMBER_OF_TOP:
-            break
-        subtopic_data = data[data["subtopic_code"] == subtopic_code]
-        if (subtopic_data["year"] != 0).sum() < MINIMUM_YEARS:
-            continue
-        count += 1
-        X = subtopic_data[["year"]]  # have to be 2d for training
-        y = subtopic_data["count_subtopic"]
+    for subject_name in total_count["subject"]:
+        subject = data[data["subject"] == subject_name]
+        X = subject[["year"]] 
+        y = subject["count_subject"]
 
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.2, random_state=42
@@ -59,8 +52,8 @@ def model_training(data: pd.DataFrame):
         mse = mean_squared_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
 
-        print("mse:", mse)
-        print("r2", r2)
+        print("MSE:", mse)
+        print("R2:", r2)
 
         with open(
             base_api.relative_to_abs(
@@ -68,8 +61,8 @@ def model_training(data: pd.DataFrame):
                     "source",
                     "machine_learning",
                     "model",
-                    "subtopic",
-                    "Subtopic_{}.pkl".format(subtopic_code),
+                    "subject",
+                    "Subject_{}.pkl".format(subject_name),
                 ]
             ),
             "wb",
