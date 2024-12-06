@@ -32,6 +32,11 @@ def transform(file):
     # Add the year column to the DataFrame
     df_subjects["year"] = year_data
 
+    data = data.rename(
+        {"$": "subtopic", "@abbrev": "subject", "@code": "subtopic_code"},
+        axis="columns",
+    )
+
     return df_subjects
 
 
@@ -43,12 +48,6 @@ def get_data():
     #     transform,
     #     100,
     # )
-
-    data = data.rename(
-        {"$": "subtopic", "@abbrev": "subject", "@code": "subtopic_code"},
-        axis="columns",
-    )
-
 
     filter_data = (
         data[data.columns]
