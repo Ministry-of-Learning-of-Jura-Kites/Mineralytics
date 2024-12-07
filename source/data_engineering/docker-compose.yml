@@ -44,6 +44,7 @@ services:
       - 8080:8080
     volumes:
       - ./airflow/dags:/opt/airflow/dags
+      - logs-volume:/opt/airflow/logs
     command: ["airflow webserver"]
     depends_on:
       - postgres
@@ -56,6 +57,10 @@ services:
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
     volumes:
       - ./airflow/dags:/opt/airflow/dags
+      - logs-volume:/opt/airflow/logs
     command: ["airflow scheduler"]
     depends_on:
       - postgres
+
+volumes:
+  logs-volume:

@@ -31,7 +31,7 @@ def scrape_paper(article_id):
     # print(list(authors_node))
 
     published_date = soup.select_one(
-        "li.c-article-identifiers__item:nth-child(2) time"
+        "li.c-article-identifiers__item time"
     ).decode_contents()
     published_date = datetime.strptime(published_date, "%d %B %Y").date()
     # print(published_date)
@@ -116,4 +116,5 @@ def scrape_and_save_paper(article_id: str):
 consumer = KafkaConsumer("article", bootstrap_servers="broker:9092",api_version=(3, 10, 0))
 print("connected")
 for message in consumer:
-    scrape_and_save_paper(message.value)
+    print('receive',message)
+    scrape_and_save_paper(message.value.decode("utf-8"))

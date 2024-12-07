@@ -73,13 +73,13 @@ def scrape_all(send_kafka: bool):
                 print(id)
 
 
-if __name__ == "__main__":
-    producer = KafkaProducer(
-        bootstrap_servers="localhost:9094",
-        api_version=(3, 10, 0),
-    )
-    print("connected")
-    # producer.send("article", str.encode(next(scrape(1)[0])))
-    producer.send("article", b"ggggg")
-    print("finished")
-    producer.flush()
+# if __name__ == "__main__":
+#     producer = KafkaProducer(
+#         bootstrap_servers="localhost:9094",
+#         api_version=(3, 10, 0),
+#     )
+#     print("connected")
+#     # producer.send("article", str.encode(next(scrape(1)[0])))
+#     producer.send("article", b"ggggg")
+#     print("finished")
+#     producer.flush()
