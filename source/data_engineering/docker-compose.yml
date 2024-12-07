@@ -26,8 +26,8 @@ services:
   #     - "9092:9092"
   #     - "9093:9093"
 
-  # scraper:
-  #   build: ./scraper
+  paper_scraper:
+    build: ./paper_scraper
 
   airflow-webserver:
     build: ./airflow
