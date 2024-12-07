@@ -9,7 +9,7 @@ from utils import scrape_all
 with DAG(
     dag_id="find_new_papers",
     start_date=datetime.datetime(2024, 12, 5),
-    schedule=datetime.timedelta(seconds=30),
+    schedule=datetime.timedelta(minutes=5),
     catchup=False,
 ) as dag:
     # EmptyOperator(task_id="test")

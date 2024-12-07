@@ -36,7 +36,9 @@ def scrape(page: int) -> Tuple[Iterable[str], bool]:
 
 def relative_to_abs(relative_path: List[any]) -> str:
     dirname = os.path.dirname(os.path.abspath(__file__))
-    return os.path.abspath(os.path.join(dirname, "..", "..", "..", "..", *map(str, relative_path)))
+    return os.path.abspath(
+        os.path.join(dirname, "..", "..", "..", "..", *map(str, relative_path))
+    )
 
 
 def _is_stored(file_name):
@@ -55,7 +57,7 @@ def is_stored(file_name):
 
 def scrape_all(send_kafka: bool):
     if send_kafka:
-      producer = KafkaProducer(bootstrap_servers="broker:9092")
+        producer = KafkaProducer(bootstrap_servers="broker:9092")
 
     page = 1
     has_next = True
@@ -66,6 +68,18 @@ def scrape_all(send_kafka: bool):
                 has_next = False
                 break
             if send_kafka:
-              producer.send("article", str.encode(id))
+                producer.send("article", str.encode(id))
             else:
-              print(id)
+                print(id)
+
+
+if __name__ == "__main__":
+    producer = KafkaProducer(
+        bootstrap_servers="localhost:9094",
+        api_version=(3, 10, 0),
+    )
+    print("connected")
+    # producer.send("article", str.encode(next(scrape(1)[0])))
+    producer.send("article", b"ggggg")
+    print("finished")
+    producer.flush()
