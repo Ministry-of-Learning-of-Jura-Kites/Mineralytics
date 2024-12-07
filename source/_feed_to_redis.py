@@ -27,4 +27,4 @@ for folder in folders_list:
         with open(base_api.relative_to_abs(["data", folder, file])) as data:
             read = json.load(data)
             eid = read["abstracts-retrieval-response"]["coredata"]["eid"]
-            redis_instance.set("folder:{folder}:eid:{eid}", json.dumps(read, separators=(",", ":")))
+            redis_instance.set("folder:{}:eid:{}".format(folder,eid), json.dumps(read, separators=(",", ":")))

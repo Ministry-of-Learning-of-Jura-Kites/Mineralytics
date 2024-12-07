@@ -1,10 +1,13 @@
 from datetime import datetime
+import json
 from pathos.multiprocessing import ProcessingPool as Pool
 from pathos.helpers import mp as multiprocess
 import pandas as pd
 import os
 from typing import Callable, List
 import traceback
+import datetime
+import redis
 
 UPDATE_PERCENT_EVERY = 40  # every n updates -> update loading bar
 
@@ -137,3 +140,19 @@ def load_all_data(transform: Callable[[str], pd.DataFrame]) -> pd.DataFrame:
         return (files_list, len(files_list))
 
     return load_data(read_data, transform)
+
+# redis_instance = redis.Redis(host="localhost", port=6379, db=0,password="admin")
+
+# def load_all_data(transform: Callable[[str], pd.DataFrame]) -> pd.DataFrame:
+#   df = pd.DataFrame()
+#   start = datetime.datetime.now()
+#   count=0
+#   for key in redis_instance.scan_iter("folder:*"):
+#     count+=1
+#     if count%100==0:
+#       print(count,(datetime.datetime.now()-start).total_seconds(),"seconds")
+#     json_content = redis_instance.get(key)
+#     # content = json.loads(json_string.decode('utf8'))
+#     df=pd.concat([df,transform(json_content)])
+#   print((datetime.datetime.now()-start).total_seconds())
+#   return df
