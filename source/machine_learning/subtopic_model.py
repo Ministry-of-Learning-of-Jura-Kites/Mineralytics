@@ -2,6 +2,7 @@ import json
 import pickle
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 import source.base_api as base_api
@@ -50,15 +51,13 @@ def model_training(data: pd.DataFrame):
             X, y, test_size=0.2, random_state=42
         )
 
-        rf_regressor = RandomForestRegressor(
-            n_estimators=100, max_depth=None, random_state=42
-        )
-        rf_regressor.fit(X_train, y_train)
-        y_pred = rf_regressor.predict(X_test)
+        lr_regressor = LinearRegression()
+        lr_regressor.fit(X_train, y_train)
+        y_pred = lr_regressor.predict(X_test)
 
         mse = mean_squared_error(y_test, y_pred)
         r2 = r2_score(y_test, y_pred)
-
+        print(f"Subtopic Code: {subtopic_code}")
         print("mse:", mse)
         print("r2", r2)
 
@@ -74,7 +73,7 @@ def model_training(data: pd.DataFrame):
             ),
             "wb",
         ) as file:
-            pickle.dump(rf_regressor, file)
+            pickle.dump(lr_regressor, file)
 
 
 if __name__ == "__main__":
