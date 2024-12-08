@@ -1,0 +1,5 @@
+bs4
+kafka-python-ng
+lxml
+aiohttp[speedups]
+aiokafka
