@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 import source.base_api as base_api
-from source.machine_learning.subject_area import get_data
+from source.machine_learning.subject_area_data import get_data
 
 
 def model_training(data: pd.DataFrame):

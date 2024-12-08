@@ -81,7 +81,7 @@ async def scrape_paper(session, article_id):
                 }
                 return affiliation
             except Exception as e:
-                print(article_id,organization,e)
+                print(article_id, organization, e)
                 return None
 
         def to_author_group(organization_and_authors):
@@ -107,10 +107,12 @@ async def scrape_paper(session, article_id):
         result = {}
         result["abstracts-retrieval-response"] = {
             "item": {
-                "ait:date-sort": {
-                    "@day": str(published_date.day),
-                    "@year": str(published_date.year),
-                    "@month": str(published_date.month),
+                "ait:process-info": {
+                    "ait:date-sort": {
+                        "@day": str(published_date.day),
+                        "@year": str(published_date.year),
+                        "@month": str(published_date.month),
+                    }
                 },
                 "bibrecord": {
                     "head": {
