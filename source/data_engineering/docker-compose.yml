@@ -29,7 +29,7 @@ services:
   paper_scraper:
     build: ./paper_scraper
     volumes:
-      - ../../data:/data
+      - data:/data
     depends_on:
       broker:
         condition: service_healthy
@@ -37,6 +37,7 @@ services:
   airflow-webserver:
     build: ./airflow
     environment:
+      - AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS=true
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -45,6 +46,7 @@ services:
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - logs-volume:/opt/airflow/logs
+      - data:/data
     command: ["airflow webserver"]
     depends_on:
       - postgres
@@ -52,15 +54,23 @@ services:
   airflow-scheduler:
     build: ./airflow
     environment:
+      - AIRFLOW__WEBSERVER__SHOW_TRIGGER_FORM_IF_NO_PARAMS=true
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - logs-volume:/opt/airflow/logs
+      - data:/data
     command: ["airflow scheduler"]
     depends_on:
       - postgres
 
 volumes:
   logs-volume:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ../../data
+      o: bind

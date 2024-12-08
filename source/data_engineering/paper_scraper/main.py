@@ -1,13 +1,10 @@
 from time import sleep
 import json
 import logging
-import traceback
 import unicodedata
 from bs4 import BeautifulSoup
-from urllib.request import Request, urlopen
 from datetime import datetime
 from itertools import groupby
-from kafka import KafkaConsumer
 import aiohttp
 import asyncio
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
@@ -71,6 +68,22 @@ async def scrape_paper(session, article_id):
         )
         # print(list(subjects))
 
+        openaccess = "0"
+        if soup.select_one(".u-color-open-access") != None:
+            openaccess = "1"
+
+        def to_affiliation(organization):
+            try:
+                affiliation = {
+                    "affiliation-city": organization[-2],
+                    "affilname": organization[-3],
+                    "affiliation-country": organization[-1],
+                }
+                return affiliation
+            except Exception as e:
+                print(article_id,organization,e)
+                return None
+
         def to_author_group(organization_and_authors):
             organization = organization_and_authors[0]
             authors = map(lambda x: x[1], organization_and_authors[1])
@@ -91,16 +104,6 @@ async def scrape_paper(session, article_id):
             )
         )
 
-        # print(
-        #     type(title),
-        #     type(authors_node),
-        #     type(published_date),
-        #     type(organizations),
-        #     type(organizations_authors),
-        #     type(subjects),
-        #     type(author_groups),
-        # )
-
         result = {}
         result["abstracts-retrieval-response"] = {
             "item": {
@@ -108,16 +111,23 @@ async def scrape_paper(session, article_id):
                     "@day": str(published_date.day),
                     "@year": str(published_date.year),
                     "@month": str(published_date.month),
-                }
+                },
+                "bibrecord": {
+                    "head": {
+                        "author-group": author_groups,
+                        "source": {"publisher": {"publishername": "nature"}},
+                    }
+                },
             },
-            "bibrecord": {"head": {"author-group": author_groups}},
-            "coredata": {"dc:title": title},
+            "affiliation": list(map(to_affiliation, organizations)),
+            "coredata": {"dc:title": title, "openaccess": openaccess},
             "authors": {
                 "author": list(map(lambda x: {"ce:indexed-name": x}, authors_node))
             },
             "subject-areas": {
                 "subject-area": list(map(lambda subject: {"$": subject}, subjects))
             },
+            "language": {"@xml:lang": "eng"},
         }
 
         return result
@@ -145,4 +155,10 @@ async def main():
             asyncio.create_task(scrape_and_save_paper(session, article_id))
 
 
+async def test():
+    async with aiohttp.ClientSession() as session:
+        print(await scrape_paper(session, "s41567-023-02330-x"))
+
+
 asyncio.run(main())
+# asyncio.run(test())

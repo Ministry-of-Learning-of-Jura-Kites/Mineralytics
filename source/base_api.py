@@ -6,8 +6,7 @@ import pandas as pd
 import os
 from typing import Callable, List
 import traceback
-import datetime
-import redis
+from datetime import datetime
 
 UPDATE_PERCENT_EVERY = 40  # every n updates -> update loading bar
 

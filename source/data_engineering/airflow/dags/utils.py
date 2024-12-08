@@ -63,7 +63,9 @@ def is_stored(file_name):
     return found
 
 
-async def scrape_all_of_url(ARTICLE_URL, session, send_kafka: bool):
+async def scrape_all_of_url(
+    ARTICLE_URL, session, send_kafka: bool, stop_if_exists: bool
+):
     host = "broker:9092"
     # host = "localhost:9094"
     if send_kafka:
@@ -77,10 +79,10 @@ async def scrape_all_of_url(ARTICLE_URL, session, send_kafka: bool):
         if not has_next:
             print("last page")
         for id in ids:
-            # if is_stored(id):
-            #     print(id,"already exist")
-            #     has_next = False
-            #     break
+            if stop_if_exists and is_stored(id):
+                print(id, "already exist")
+                has_next = False
+                break
             if send_kafka:
                 producer.send("article", str.encode(id))
             else:
@@ -88,15 +90,23 @@ async def scrape_all_of_url(ARTICLE_URL, session, send_kafka: bool):
         page += 1
 
 
-async def scrape_all_async(send_kafka: bool):
+async def scrape_all_async(send_kafka: bool, stop_if_exists: bool):
     async with aiohttp.ClientSession() as session:
         await asyncio.gather(
-            *map(lambda url: scrape_all_of_url(url, session, send_kafka), ARTICLE_URLS)
+            *map(
+                lambda url: scrape_all_of_url(url, session, send_kafka, stop_if_exists),
+                ARTICLE_URLS,
+            )
         )
 
 
-def scrape_all(send_kafka: bool):
-    asyncio.run(scrape_all_async(send_kafka))
+def scrape_all(send_kafka: bool, **kwargs):
+    print(kwargs.get("params"))
+    asyncio.run(
+        scrape_all_async(
+            send_kafka, kwargs.get("params")["stop_if_exists"]
+        )
+    )
 
 
 # asyncio.run(scrape_all(False))
