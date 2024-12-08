@@ -20,7 +20,7 @@ def scrape(page: int) -> Tuple[Iterable[str], bool]:
     url = ARTICLE_URL + "&page=" + str(page)
     req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
     html_page = urlopen(req).read()
-    soup = BeautifulSoup(html_page, "html.parser")
+    soup = BeautifulSoup(html_page, "lxml")
     article_titles = soup.select("a.c-card__link.u-link-inherit")
     article_links = map(get_article_link, article_titles)
     disabled_link = soup.select(
@@ -42,7 +42,7 @@ def relative_to_abs(relative_path: List[any]) -> str:
 
 
 def _is_stored(file_name):
-    if os.path.isfile(relative_to_abs(["data", "scraped", file_name])):
+    if os.path.isfile(relative_to_abs(["data", "scraped", "{}.json".format(file_name)])):
         return True
 
 
@@ -52,12 +52,14 @@ def is_stored(file_name):
     found = _is_stored(file_name)
     if found:
         stored.add(file_name)
-    return stored
+    return found!=None
 
 
 def scrape_all(send_kafka: bool):
+    host = "broker:9092"
+    # host = "localhost:9094"
     if send_kafka:
-        producer = KafkaProducer(bootstrap_servers="broker:9092")
+        producer = KafkaProducer(bootstrap_servers=host)
 
     page = 1
     has_next = True
@@ -71,15 +73,7 @@ def scrape_all(send_kafka: bool):
                 producer.send("article", str.encode(id))
             else:
                 print(id)
-
+        page+=1
 
 # if __name__ == "__main__":
-#     producer = KafkaProducer(
-#         bootstrap_servers="localhost:9094",
-#         api_version=(3, 10, 0),
-#     )
-#     print("connected")
-#     # producer.send("article", str.encode(next(scrape(1)[0])))
-#     producer.send("article", b"ggggg")
-#     print("finished")
-#     producer.flush()
+#     scrape_all(False)
