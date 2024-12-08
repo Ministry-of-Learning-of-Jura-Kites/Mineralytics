@@ -1,49 +1,60 @@
 import json
+import pickle
 import pandas as pd
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
 import source.base_api as base_api
 import matplotlib.pyplot as plt
 import streamlit as st
 
-lang_column = "abstracts-retrieval-response.subject-areas.subject-area"
+# Specify the column names
+lang_column = "abstracts-retrieval-response.subject-areas.subject-area.@abbrev"
+value_column = "abstracts-retrieval-response.subject-areas.subject-area.$"
+year_column = "abstracts-retrieval-response.item.ait:process-info.ait:date-sort.@year"
 
 
 def transform(file):
+    # Load the JSON data
     data = json.load(file)
-    data = data["abstracts-retrieval-response"]["subject-areas"]["subject-area"]
-    df = pd.json_normalize(data)
-    # print(df.columns)
-    # print(df.columns)
-    return df
-    
 
-# if __name__ == "__main__":
-# @st.cache_data
-def get_data():
-    return base_api.load_all_data(transform)
+    # Extract the subject-areas and process-info sections
+    subject_areas = data["abstracts-retrieval-response"]["subject-areas"][
+        "subject-area"
+    ]
+    year_data = data["abstracts-retrieval-response"]["item"]["ait:process-info"][
+        "ait:date-sort"
+    ]["@year"]
+    # print(year_data)
+    # Normalize the subject-areas data
+    df_subjects = pd.json_normalize(subject_areas)
 
-def language():
-    df = get_data()
-    # for testing
-    # df = base_api.load_data_of_year(
-    #     2018,
-    #     lambda df: df.drop(
-    #         columns=df.columns.difference(
-    #             ["abstracts-retrieval-response.language.@xml:lang"]
-    #         )
-    #     ),
-    #     100,
-    # )
+    # Add the year column to the DataFrame
+    df_subjects["year"] = year_data
 
-    value_counts = df[lang_column].value_counts()
-    fig, ax = plt.subplots()
-    ax.bar(
-        value_counts.index.to_list(),
-        value_counts.values,
+    df_subjects = df_subjects.rename(
+        {"$": "subtopic", "@abbrev": "subject", "@code": "subtopic_code"},
+        axis="columns",
     )
-    ax.set_yscale("log", base=2)
-    ax.set_ylabel("count")
-    ax.set_xlabel("subject-area")
-    return fig
 
-data = get_data()
-print(data[["@abbrev" , "$"]]) 
+    return df_subjects
+
+
+def get_data():
+    data = base_api.load_all_data(transform)
+
+    filter_data = (
+        data[data.columns]
+        .groupby(data.columns.tolist())
+        .size()
+        .reset_index(name="count_subtopic")
+        .sort_values(by="year", ascending=True)
+    )
+    
+    filter_data.dropna(subset="year", inplace=True)
+    filter_data = filter_data.sort_values(by="year", ascending=True)
+    return filter_data
+
+
+if __name__ == "__main__":
+    get_data()

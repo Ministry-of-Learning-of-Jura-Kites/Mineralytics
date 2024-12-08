@@ -6,7 +6,5 @@ scipy
 bs4
 plotly
 streamlit
+scikit-learn
 kafka-python-ng
-redis
-patool
-pyunpack
