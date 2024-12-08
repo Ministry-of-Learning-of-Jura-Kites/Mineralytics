@@ -23,7 +23,7 @@ async def scrape_paper(session, article_id):
     async with session.get(url) as response:
         soup = BeautifulSoup(await response.content.read(), "lxml")
 
-        title = next(soup.select_one(".c-article-title").children)
+        title = get_first_child(soup.select_one(".c-article-title"))
         # print(title)
 
         authors_node = map(
@@ -91,6 +91,16 @@ async def scrape_paper(session, article_id):
             )
         )
 
+        # print(
+        #     type(title),
+        #     type(authors_node),
+        #     type(published_date),
+        #     type(organizations),
+        #     type(organizations_authors),
+        #     type(subjects),
+        #     type(author_groups),
+        # )
+
         result = {}
         result["abstracts-retrieval-response"] = {
             "item": {
@@ -115,7 +125,11 @@ async def scrape_paper(session, article_id):
 
 async def scrape_and_save_paper(session, article_id: str):
     with open("/data/scraped/{}.json".format(article_id), "w") as f:
-        f.write(json.dumps(await scrape_paper(session, article_id)))
+        scraped = await scrape_paper(session, article_id)
+        try:
+            f.write(json.dumps(scraped))
+        except Exception as e:
+            logging.error(e)
 
 
 async def main():
