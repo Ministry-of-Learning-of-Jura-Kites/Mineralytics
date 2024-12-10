@@ -9,6 +9,7 @@ import data_visualization.openaccess as openaccess
 import data_visualization.city as city
 import data_visualization.subtopic as subtopic
 from data_visualization.get_data import get_data, get_embeddings, get_file_index
+import data_visualization.subject as subject
 import os
 import pickle
 import glob
@@ -24,6 +25,15 @@ def get_trained_subtopics(path_to_models):
         os.path.splitext(os.path.basename(f))[0].split("_")[1] for f in pkl_files
     ]
     return trained_subtopics
+
+
+def get_trained_subject(path_to_models):
+    absolute_path = base_api.relative_to_abs(path_to_models)
+    pkl_files = glob.glob(os.path.join(absolute_path, "Subject_*.pkl"))
+    trained_subject = [
+        os.path.splitext(os.path.basename(f))[0].split("_")[1] for f in pkl_files
+    ]
+    return trained_subject
 
 
 def load_pickle(path_to_pickle, file_name):
@@ -53,14 +63,20 @@ if __name__ == "__main__":
     language_fig = language.get_fig()
     st.pyplot(language_fig)
 
+    st.write("---")
+    
     st.header("open access")
     openaccess_fig = openaccess.get_fig()
     st.plotly_chart(openaccess_fig)
 
+    st.write("---")
+    
     st.header("city")
     affiliation_fig = city.get_fig()
     st.plotly_chart(affiliation_fig)
 
+    st.write("---")
+    
     st.header("subtopic")
     subtopic_list = data["subtopic"].dropna().unique().tolist()
     trained_subtopics = get_trained_subtopics(
@@ -80,7 +96,7 @@ if __name__ == "__main__":
         ["-- Select subtopic --"] + sorted_subtopics,
         placeholder="Select subtopic",
     )
-    if selected_subtopic and selected_subtopic != "-- Select subtopic --":
+    if selected_subtopic != "-- Select subtopic --":
         subtopic_code = data.loc[
             data["subtopic"] == selected_subtopic, "subtopic_code"
         ].values[0]
@@ -93,11 +109,47 @@ if __name__ == "__main__":
         else:
             subtopic_fig = subtopic.get_fig(selected_subtopic)
             st.plotly_chart(subtopic_fig)
+            
+    st.write("---")
+    
+    st.header("subject")
+    subject_list = data["subject"].dropna().unique().tolist()
+    train_subject = get_trained_subtopics(
+        ["source", "machine_learning", "model", "subject"]
+    )
+    sorted_subject = sorted(
+        subject_list,
+        key=lambda x: (
+            -1
+            if data.loc[data["subject"] == x, "subject"].values[0] in train_subject
+            else 1
+        ),
+    )
+    selected_subject = st.selectbox(
+        "Subject",
+        ["-- Select subject --"] + sorted_subject,
+        placeholder="Select subject",
+    )
 
-    st.header("search papers frorm abstracts")
+    if selected_subject != "-- Select subject --":
+        subject_code = data.loc[data["subject"] == selected_subject, "subject"].values[
+            0
+        ]
+        choose = "Subject_" + subject_code + ".pkl"
+        model = load_pickle(["source", "machine_learning", "model", "subject"], choose)
+
+        if model:
+            subject_fig = subject.get_fig(selected_subject, model)
+            st.plotly_chart(subject_fig)
+        else:
+            subject_fig = subject.get_fig(selected_subject)
+            st.plotly_chart(subject_fig)
+
+    st.write("---")
+    
+    st.header("Search Papers From Abstracts")
     prompt = st.text_input("search", value="")
     file_index = get_file_index()
-    st.write("---")
     if prompt != "":
         indices = search_paper.search(prompt)
         for index, result_index in enumerate(indices[0]):
