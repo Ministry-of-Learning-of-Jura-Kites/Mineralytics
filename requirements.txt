@@ -8,3 +8,4 @@ plotly
 streamlit
 scikit-learn
 kafka-python-ng
+sentence-transformers

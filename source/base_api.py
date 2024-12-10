@@ -1,4 +1,5 @@
 from datetime import datetime
+from inspect import signature
 import json
 from pathos.multiprocessing import ProcessingPool as Pool
 from pathos.helpers import mp as multiprocess
@@ -16,9 +17,16 @@ def relative_to_abs(relative_path: List[any]) -> str:
     return os.path.join(dirname, "..", *map(str, relative_path))
 
 
-def load_json(path: str, transform: Callable[[str], pd.DataFrame]) -> pd.DataFrame:
-    with open(path, "r", encoding="utf-8") as file:
-        df = transform(file)
+def load_json(
+    relative_file_path: str, transform: Callable[[str], pd.DataFrame]
+) -> pd.DataFrame:
+    with open(relative_to_abs(relative_file_path), "r", encoding="utf-8") as file:
+        sig = signature(transform)
+        if len(sig.parameters) == 1:
+            df = transform(file)
+        else:
+            df = transform(file, relative_file_path)
+        return df
     return df
 
 
@@ -29,7 +37,7 @@ def download_function(
         if has_exit.value:
             return
         try:
-            data = load_json(relative_to_abs(["data", file]), transform)
+            data = load_json(["data", file], transform)
             with counter_lock:
                 counter.value += 1
             if counter.value % UPDATE_PERCENT_EVERY == 0 or counter.value == max:
@@ -131,7 +139,7 @@ def load_all_data(transform: Callable[[str], pd.DataFrame]) -> pd.DataFrame:
         folders_list = os.listdir(relative_to_abs(["data"]))
         for folder in folders_list:
             if not os.path.isdir(relative_to_abs(["data", folder])):
-              continue
+                continue
             current_file_list = os.listdir(relative_to_abs(["data", folder]))
             files_list += map(
                 lambda file: os.path.join(folder, file), current_file_list
@@ -139,6 +147,7 @@ def load_all_data(transform: Callable[[str], pd.DataFrame]) -> pd.DataFrame:
         return (files_list, len(files_list))
 
     return load_data(read_data, transform)
+
 
 # redis_instance = redis.Redis(host="localhost", port=6379, db=0,password="admin")
 

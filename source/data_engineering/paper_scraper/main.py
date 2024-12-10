@@ -104,6 +104,8 @@ async def scrape_paper(session, article_id):
             )
         )
 
+        abstracts = "".join(soup.select_one("#Abs1-content > p:nth-child(1)").strings)
+
         result = {}
         result["abstracts-retrieval-response"] = {
             "item": {
@@ -118,6 +120,7 @@ async def scrape_paper(session, article_id):
                     "head": {
                         "author-group": author_groups,
                         "source": {"publisher": {"publishername": "nature"}},
+                        "abstracts": abstracts,
                     }
                 },
             },
@@ -159,8 +162,8 @@ async def main():
 
 async def test():
     async with aiohttp.ClientSession() as session:
-        print(await scrape_paper(session, "s41567-023-02330-x"))
+        print(await scrape_paper(session, "s41586-023-06873-0"))
 
 
-asyncio.run(main())
 # asyncio.run(test())
+asyncio.run(main())

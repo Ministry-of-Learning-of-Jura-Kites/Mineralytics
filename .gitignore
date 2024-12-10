@@ -1,3 +1,5 @@
 __pycache__
-data
+data/*
 .venv
+!data/embeddings
+!data/file_index.json

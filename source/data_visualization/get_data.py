@@ -1,12 +1,15 @@
+import numpy as np
 import pandas as pd
 import json
+from sentence_transformers import SentenceTransformer
 import streamlit as st
+import torch
 import base_api as base_api
 
 
 def transform(file):
+    # print(file.read())
     data = json.load(file)
-
     # lang
     lang_df = None
     if data["abstracts-retrieval-response"]["language"] != None:
@@ -65,3 +68,21 @@ def transform(file):
 @st.cache_data
 def get_data():
     return base_api.load_all_data(transform)
+
+
+@st.cache_data
+def get_embeddings():
+    return torch.load(
+        base_api.relative_to_abs(["data", "embeddings"]), weights_only=True
+    )
+
+
+@st.cache_data
+def get_file_index():
+    with open(base_api.relative_to_abs(["data", "file_index.json"]), "r") as f:
+        return json.loads(f.read())
+
+
+@st.cache_data
+def get_model():
+    return SentenceTransformer("all-MiniLM-L6-v2")
